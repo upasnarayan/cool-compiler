@@ -76,7 +76,7 @@ RANLIB = gar -qs
 # you may need to change the following two lines. 
 #
 BINARIES = spim xspim aps2c++ coolc
-ASSIGNMENTS = PA1 PA2 PA2J PA3 PA3J PA4 PA4J PA5 PA5J
+ASSIGNMENTS = PA2 PA3 PA4 PA5
 
 # 
 # The cool distribution is designed to support multiple architecutres on a single
