@@ -15,7 +15,7 @@ git clone https://github.com/upasnarayan/cool-compiler.git
 Add the bin directory to your $PATH environment variable. If you are using
 bash, add to your .profile (or .bash_profile, etc. depending on your
 configuration; note that in Ubuntu have to log out and back in for this to 
-take effect):
+take effect): 
 PATH=/usr/class/cs143/cool/bin:$PATH
 
 Test the lexer and parser as follows:
