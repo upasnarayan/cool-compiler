@@ -1,7 +1,7 @@
 cool-compiler
 =============
 
-Complete compiler for the COOL programming language.
+Complete compiler in C++ for the COOL programming language.
 
 
 
