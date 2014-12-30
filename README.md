@@ -17,7 +17,7 @@ Complete compiler for the COOL programming language.
 bash, add to your .profile (or .bash_profile, etc. depending on your
 configuration; note that in Ubuntu have to log out and back in for this to 
 take effect): 
-`PATH=/usr/class/cs143/cool/bin:$PATH`
+`PATH=$$REPO_DIR$$/bin:$PATH`
 
 ##Usage
 
