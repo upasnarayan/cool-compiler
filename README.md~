@@ -27,4 +27,3 @@ make lexer
 cd assignments/PA3
 make lexer parser
 ./parser file.cl
-
