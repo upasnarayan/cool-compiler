@@ -21,7 +21,7 @@ take effect):
 
 ##Usage
 
-Test the lexer and parser as follows:
+Code for the lexer (regexp) can be found at `assignments/PA2/cool.flex`, and code for the parser (CFG rules) can be found at `assignments/PA3/cool.y`. Test the lexer and parser as follows:
 
 
     cd assignments/PA2
