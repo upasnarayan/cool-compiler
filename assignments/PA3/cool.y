@@ -5,6 +5,7 @@
 */
 %{
   #include <iostream>
+  #include <list>
   #include "cool-tree.h"
   #include "stringtab.h"
   #include "utilities.h"
@@ -76,7 +77,27 @@
     
     void yyerror(char *s);        /*  defined below; called for each parse error */
     extern int yylex();           /*  the entry point to the lexer  */
-    
+    Expression returnDefaultExpr(Symbol s); /* returns default expression based on symbol */
+    class Let_class {
+        protected:
+            Symbol id;
+            Symbol type;
+            Expression expr;
+        public:
+            Let_class(Symbol i, Symbol t, Expression e) {
+                id = i;
+                type = t;
+                expr = e;
+            }
+            Symbol get_id() { return id; }
+            Symbol get_type() { return type; }
+            Expression get_expr() { return expr; }
+    };
+
+    typedef Let_class* Let;
+    typedef std::list<Let>* Lets;
+
+
     /************************************************************************/
     /*                DONT CHANGE ANYTHING IN THIS SECTION                  */
     
@@ -100,6 +121,8 @@
       Cases cases;
       Expression expression;
       Expressions expressions;
+      Let let;
+      Lets lets;
       char *error_msg;
     }
     
@@ -133,12 +156,28 @@
     %type <program> program
     %type <classes> class_list
     %type <class_> class
-    
-    /* You will want to change the following line. */
-    %type <features> dummy_feature_list
+    %type <feature> feature
+    %type <features> feature_list
+    %type <features> nonempty_feature_list
+    %type <formal> formal
+    %type <formals> formal_list
+    %type <expression> expr
+    %type <expressions> comma_expr_list
+    %type <expressions> semi_expr_list
+    %type <case_> case
+    %type <cases> case_list
+    %type <let> let
+    %type <lets> let_list
     
     /* Precedence declarations go here. */
-    
+    %right ASSIGN
+    %left NOT
+    %nonassoc LE '<' '='
+    %left '+' '-'
+    %left '*' '/'
+    %left ISVOID
+    %left '~'
+    %left '.';
     
     %%
     /* 
@@ -157,20 +196,221 @@
     ;
     
     /* If no parent is specified, the class inherits from the Object class. */
-    class	: CLASS TYPEID '{' dummy_feature_list '}' ';'
+    class
+    : CLASS TYPEID '{' feature_list '}' ';'
     { $$ = class_($2,idtable.add_string("Object"),$4,
     stringtable.add_string(curr_filename)); }
-    | CLASS TYPEID INHERITS TYPEID '{' dummy_feature_list '}' ';'
+    | CLASS TYPEID INHERITS TYPEID '{' feature_list '}' ';'
     { $$ = class_($2,$4,$6,stringtable.add_string(curr_filename)); }
+    | error ';'
+    { $$ = NULL; }
     ;
     
     /* Feature list may be empty, but no empty features in list. */
-    dummy_feature_list:		/* empty */
-    {  $$ = nil_Features(); }
+    feature_list:
+    /* many features */
+    nonempty_feature_list
+    {   $$ = $1; }
+    /* empty */
+    |
+    {   $$ = nil_Features(); }
+    ;
+    
+    nonempty_feature_list
+    /* single feature */
+    : feature
+    {   $$ = single_Features($1); }
+    /* many features */
+    | nonempty_feature_list feature
+    {   $$ = append_Features($1, single_Features($2)); }
+    ;
+    
+    feature
+    /* method declaration */
+    : OBJECTID '(' formal_list ')' ':' TYPEID '{' expr '}' ';'
+    {   $$ = method($1, $3, $6, $8); }
+    /* variable declaration w/ default value */
+    | OBJECTID ':' TYPEID ';'
+    {   $$ = attr($1, $3, no_expr()); }
+    /* variable declaration w/ provided value */
+    | OBJECTID ':' TYPEID ASSIGN expr ';'
+    {   $$ = attr($1, $3, $5); }
+    | error ';'
+    {   }
+    ;
+
+    formal_list
+    /* single formal */
+    : formal
+    {   $$ = single_Formals($1); }
+    /* many formals */
+    | formal_list ',' formal
+    {   $$ = append_Formals($1, single_Formals($3)); }
+    /* no formals */
+    | 
+    {   $$ = nil_Formals(); }
+    ;
+
+    formal
+    : OBJECTID ':' TYPEID
+    {   $$ = formal($1, $3); }
+    ;
+
+    expr
+    /* assignment */
+    : OBJECTID ASSIGN expr
+    {   $$ = assign($1, $3); }
+    /* regular dispatch */
+    | expr '.' OBJECTID '(' comma_expr_list ')'
+    {   $$ = dispatch($1, $3, $5); }
+    /* static dispatch */
+    | expr '@' TYPEID '.' OBJECTID '(' comma_expr_list ')'
+    {   $$ = static_dispatch($1, $3, $5, $7); }
+    /* self dispatch */
+    | OBJECTID '(' comma_expr_list ')'
+    {   $$ = dispatch(object(idtable.add_string("self")), $1, $3); }
+    /* if then else */
+    | IF expr THEN expr ELSE expr FI
+    {   $$ = cond($2, $4, $6); }
+    /* loop */
+    | WHILE expr LOOP expr POOL
+    {   $$ = loop($2, $4); }
+    /* block */
+    | '{' semi_expr_list '}'
+    {   $$ = block($2); }
+    /* let */
+    | LET let_list IN expr
+    {   
+        std::list<Let> *l = $2;
+        Expression body = $4;
+        for (std::list<Let>::reverse_iterator i = l->rbegin(); 
+                i != l->rend(); ++i ) {
+            body = let((*i)->get_id(), (*i)->get_type(), (*i)->get_expr(), body);
+        }
+        $$ = body;
+    }
+    /* case */
+    | CASE expr OF case_list ESAC
+    {   $$ = typcase($2, $4); }
+    /* new */
+    | NEW TYPEID
+    {   $$ = new_($2); }
+    /* isvoid */
+    | ISVOID expr
+    {   $$ = isvoid($2); }
+    /* operations */
+    | expr '+' expr
+    {   $$ = plus($1, $3); }
+    | expr '-' expr
+    {   $$ = sub($1, $3); }
+    | expr '*' expr
+    {   $$ = mul($1, $3); }
+    | expr '/' expr
+    {   $$ = divide($1, $3); }
+    | '~' expr
+    {   $$ = neg($2); }
+    | expr '<' expr
+    {   $$ = lt($1, $3); }
+    | expr LE expr
+    {   $$ = leq($1, $3); }
+    | expr '=' expr
+    {   $$ = eq($1, $3); }
+    | NOT expr
+    {   $$ = comp($2); }
+    /* parens */
+    | '(' expr ')'
+    {   $$ = $2; }
+    /* literals */
+    | OBJECTID
+    {   $$ = object($1); }
+    | INT_CONST
+    {   $$ = int_const($1); }
+    | STR_CONST
+    {   $$ = string_const($1); }
+    | BOOL_CONST
+    {   $$ = bool_const($1); }
+    ;
+
+    comma_expr_list
+    /* single expression */
+    : expr
+    {   $$ = single_Expressions($1); }
+    /* many expressions */
+    | comma_expr_list ',' expr
+    {   $$ = append_Expressions($1, single_Expressions($3)); }
+    /* no expression */
+    | 
+    {   $$ = nil_Expressions(); }
+    ;
+
+    semi_expr_list
+    /* single expression */
+    : expr ';'
+    {   $$ = single_Expressions($1); }
+    /* many expressions */
+    | semi_expr_list expr ';'
+    {   $$ = append_Expressions($1, single_Expressions($2)); }
+    | error ';'
+    {   }
+    ;
+    
+    case
+    : OBJECTID ':' TYPEID DARROW expr ';'
+    {   $$ = branch($1, $3, $5); }
+    ;
+
+    case_list
+    : case
+    {   $$ = single_Cases($1); }
+    | case_list case
+    {   $$ = append_Cases($1, single_Cases($2)); }
+    ;
+
+    let
+    : OBJECTID ':' TYPEID
+    {   $$ = new Let_class($1, $3, no_expr()); }
+    | OBJECTID ':' TYPEID ASSIGN expr
+    {   $$ = new Let_class($1, $3, $5); }
+    ;
+
+    let_list
+    : let
+    {   
+        std::list<Let> *l = new std::list<Let>();
+        l->push_back($1);
+        $$ = l; 
+    }
+    | let_list ',' let
+    {   
+        std::list<Let> *l;
+        if ($1 == NULL) {
+            l = new std::list<Let>();
+        } else {
+            l = $1;
+        }
+        l->push_back($3);
+        $$ = l;
+    }
+    | error let
+    {   $$ = new std::list<Let>(); }
+    ;   
     
     
     /* end of grammar */
     %%
+
+    Expression returnDefaultExpr(Symbol s) {
+        char *type = s->get_string();
+        if (strcmp(type, "Bool") == 0) {
+            return bool_const(false);
+        } else if (strcmp(type, "Int") == 0) {
+            return int_const(inttable.add_string("0"));
+        } else if (strcmp(type, "String") == 0) {
+            return string_const(stringtable.add_string(""));
+        } else {
+            return no_expr();
+        }
+    }
     
     /* This function is called automatically when Bison detects a parse error. */
     void yyerror(char *s)
