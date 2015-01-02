@@ -1,7 +1,7 @@
 cool-compiler
 =============
 
-Complete compiler in C++ for the COOL programming language. Stanford CS143 Compilers MOOC.
+Complete compiler in C++ for the COOL programming language. Done as part of Stanford CS143 Compilers MOOC.
 
 
 
@@ -18,11 +18,11 @@ Complete compiler in C++ for the COOL programming language. Stanford CS143 Compi
     sudo cp lib/trap.handler /usr/class/cs143/cool/lib/trap.handler
     ```
 
-- Add the bin directory to your $PATH environment variable. If you are using
-bash, add to your .profile (or .bash_profile, etc. depending on your
+- Add the `bin` directory to your `$PATH` environment variable. If you are using
+bash, add to your `.profile` (or `.bash_profile`, etc. depending on your
 configuration; note that in Ubuntu have to log out and back in for this to 
 take effect): 
-`PATH=$$REPO_DIR$$/bin:$PATH`. For example, if the repo has been cloned in the home directory, add `PATH=$HOME/cool-compiler/bin:$PATH`.
+`PATH="$$REPO_DIR$$/bin:$PATH"`. For example, if the repo has been cloned in the home directory, add `PATH="$HOME/cool-compiler/bin:$PATH"` to either `~/.profile` or `~/.bash_profile`.
 
 ##Usage
 
