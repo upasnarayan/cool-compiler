@@ -1,0 +1,135 @@
+#1
+_program
+  #1
+  _class
+    A
+    Object
+    "./classes.test"
+    (
+    #1
+    _attr
+      a
+      Int
+      #1
+      _int
+        0
+      : _no_type
+    #1
+    _attr
+      d
+      Int
+      #1
+      _int
+        1
+      : _no_type
+    #1
+    _method
+      f
+      Int
+      #1
+      _assign
+        a
+        #1
+        _plus
+          #1
+          _object
+            a
+          : _no_type
+          #1
+          _object
+            d
+          : _no_type
+        : _no_type
+      : _no_type
+    )
+  #1
+  _class
+    B
+    A
+    "./classes.test"
+    (
+    #1
+    _attr
+      b
+      Int
+      #1
+      _int
+        2
+      : _no_type
+    #1
+    _method
+      f
+      Int
+      #1
+      _object
+        a
+      : _no_type
+    #1
+    _method
+      g
+      Int
+      #1
+      _assign
+        a
+        #1
+        _sub
+          #1
+          _object
+            a
+          : _no_type
+          #1
+          _object
+            b
+          : _no_type
+        : _no_type
+      : _no_type
+    )
+  #1
+  _class
+    C
+    A
+    "./classes.test"
+    (
+    #1
+    _attr
+      c
+      Int
+      #1
+      _int
+        3
+      : _no_type
+    #1
+    _method
+      h
+      Int
+      #1
+      _assign
+        a
+        #1
+        _sub
+          #1
+          _object
+            a
+          : _no_type
+          #1
+          _object
+            c
+          : _no_type
+        : _no_type
+      : _no_type
+    )
+  #1
+  _class
+    Main
+    Object
+    "./classes.test"
+    (
+    #1
+    _method
+      main
+      Int
+      #1
+      _int
+        6
+      : _no_type
+    )

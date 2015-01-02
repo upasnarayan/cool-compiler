@@ -1,0 +1,86 @@
+#1
+_program
+  #1
+  _class
+    Main
+    IO
+    "./io.test"
+    (
+    #1
+    _attr
+      x
+      Int
+      #1
+      _no_expr
+      : _no_type
+    #1
+    _attr
+      y
+      String
+      #1
+      _no_expr
+      : _no_type
+    #1
+    _method
+      main
+      Object
+      #1
+      _block
+        #1
+        _dispatch
+          #1
+          _object
+            self
+          : _no_type
+          out_string
+          (
+          #1
+          _string
+            "test"
+          : _no_type
+          )
+        : _no_type
+        #1
+        _dispatch
+          #1
+          _object
+            self
+          : _no_type
+          out_int
+          (
+          #1
+          _int
+            5
+          : _no_type
+          )
+        : _no_type
+        #1
+        _assign
+          y
+          #1
+          _dispatch
+            #1
+            _object
+              self
+            : _no_type
+            in_string
+            (
+            )
+          : _no_type
+        : _no_type
+        #1
+        _assign
+          x
+          #1
+          _dispatch
+            #1
+            _object
+              self
+            : _no_type
+            in_int
+            (
+            )
+          : _no_type
+        : _no_type
+      : _no_type
+    )

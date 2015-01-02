@@ -1,0 +1,36 @@
+#1
+_program
+  #1
+  _class
+    Main
+    Object
+    "./missingclass.test"
+    (
+    #1
+    _method
+      main
+      Int
+      #1
+      _int
+        0
+      : _no_type
+    )
+  #1
+  _class
+    A
+    D
+    "./missingclass.test"
+    (
+    #1
+    _method
+      foo
+      #1
+      _formal
+        x
+        Int
+      Object
+      #1
+      _int
+        5
+      : _no_type
+    )
