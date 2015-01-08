@@ -1,7 +1,7 @@
 cool-compiler
 =============
 
-Complete compiler in C++ for the COOL programming language. Done as part of Stanford CS143 Compilers MOOC.
+Compiler in C++ for the COOL programming language. Done as part of Stanford CS143 Compilers MOOC. Finished the lexer and parser components of the project.
 
 
 
